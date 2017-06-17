@@ -1,6 +1,6 @@
 # Test the C++ Library
 
-In the file `tests.cpp` it is provided a simple test for the Rotary Sensor module. The test consist in taking measurements every `500ms`, the functions used to retrieve the values from the Analog Sensors Module are: `rotary.getValue()` and `rotary.getScaledValue()`, and then the measurements are printed out to the console as `float` and `integer` values, respectively.
+In the file `test.cpp` it is provided a simple test for the Sound Sensor module. The test consists in taking measurements every `10ms`, the result is printed and the values goes from `[-2.5, 2.5]` and the basic values are in the range `[-100, 100]`.
 
 To run the test follow these steps:
 
