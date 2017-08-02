@@ -1,6 +1,6 @@
 const SoundSensor = require('../index');
 
-const sound = new SoundSensor(2);
+const sound = new SoundSensor(1);
 
 sound.enableEvents();
 

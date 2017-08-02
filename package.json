@@ -3,12 +3,7 @@
   "version": "1.0.0",
   "description": "Node library to read the Sound Sensor from the Analog Module",
   "main": "index.js",
-  "keywords": [
-    "sound",
-    "sensor",
-    "robotois",
-    "IOT"
-  ],
+  "keywords": [],
   "directories": {
     "test": "tests"
   },
@@ -19,7 +14,6 @@
   "dependencies": {
     "bindings": "^1.2.1"
   },
-  "keywords": [],
   "author": "yovany@robotois.com",
   "license": "ISC",
   "gypfile": true,

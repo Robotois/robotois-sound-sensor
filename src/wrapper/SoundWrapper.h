@@ -3,7 +3,7 @@
 
 #include <node.h>
 #include <node_object_wrap.h>
-#include "../Modules/AnalogModules/SoundSensor.h"
+#include "../SoundSensor.h"
 
 class SoundWrapper : public node::ObjectWrap {
 public:

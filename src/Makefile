@@ -8,21 +8,18 @@ OBJECTS = \
 	test.o \
 	ADS1015.o \
 	SoundSensor.o \
-	AccurateTiming.o
 
 #OBJECTS = $(subst .cpp,.o,$(SOURCES))
 
-all: ads.o rotary.o timer.o main.o
+all: ads.o sound.o main.o
 	$(CC) $(LINKER_FLAGS) -o runner $(OBJECTS) $(LIBS)
 
 main.o: test.cpp
 	$(CC) $(COMPILE_FLAGS) test.cpp
-ads.o: Libraries/ADS1015/ADS1015.cpp Libraries/ADS1015/ADS1015.h
-	$(CC) $(COMPILE_FLAGS) Libraries/ADS1015/ADS1015.cpp
-timer.o: Libraries/Timer/AccurateTiming.cpp Libraries/Timer/AccurateTiming.h
-	$(CC) $(COMPILE_FLAGS) Libraries/Timer/AccurateTiming.cpp
-rotary.o: Modules/AnalogModules/SoundSensor.cpp Modules/AnalogModules/SoundSensor.h
-	$(CC) $(COMPILE_FLAGS) Modules/AnalogModules/SoundSensor.cpp
+ads.o: libraries/robotois-ADS1015/ADS1015.cpp libraries/robotois-ADS1015/ADS1015.h
+	$(CC) $(COMPILE_FLAGS) libraries/robotois-ADS1015/ADS1015.cpp
+sound.o: SoundSensor.cpp SoundSensor.h
+	$(CC) $(COMPILE_FLAGS) SoundSensor.cpp
 
 clean:
 	$(RM) $(OBJECTS) runner

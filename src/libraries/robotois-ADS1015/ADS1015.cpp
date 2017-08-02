@@ -8,11 +8,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <bcm2835.h>
-#include<iostream>
-#include<cmath>
+#include <iostream>
+#include <cmath>
 #include <unistd.h>
 #include "ADS1015.h"
-#include "../../Libraries/Timer/AccurateTiming.h"
+#include <vector>
+
+#include <thread>
+#include <chrono>
 
 ADS1015::ADS1015(uint8_t _addr) {
     uint8_t result;
@@ -100,7 +103,7 @@ void ADS1015::selectInput(uint8_t _inputAdd, uint8_t _gain){
     wBuf[2] = config_low;
 
     bcm2835_i2c_write(wBuf, 3);
-    mDelay(1);
+    std::this_thread::sleep_for(std::chrono::microseconds(1000));
 }
 
 /**
@@ -159,4 +162,99 @@ void ADS1015::bcm_end(){
 
 void ADS1015::release(){
     // bcm_end();
+}
+
+std::vector<float> ADS1015::inputSampling(uint8_t port, uint8_t gain, uint16_t sampleTime){
+    selectModule();
+    initContinuousMode(port, gain);
+    std::vector<float> samples;
+    
+    auto startTime = std::chrono::high_resolution_clock::now();
+    auto elapsedTime = std::chrono::high_resolution_clock::now() - startTime;
+    while (
+        sampleTime >
+        std::chrono::duration_cast<std::chrono::milliseconds>(elapsedTime).count()
+    ){
+        samples.push_back(readSample());
+        std::this_thread::sleep_for(std::chrono::microseconds(100));
+        elapsedTime = std::chrono::high_resolution_clock::now() - startTime;
+    }
+//    printf("Samples Size: %d\n", samples.size());
+    return samples;
+}
+
+std::vector<float> ADS1015::minMax(std::vector<float> samples){
+    float min = 2.5, max = 2.5;
+    std::vector<float> minmax;
+    for(float sample : samples){
+        if(sample < min){
+            min = sample;
+        } else {
+            if(sample > max){
+                max = sample;
+            }
+        }
+    }
+    minmax.push_back(min);
+    minmax.push_back(max);
+    return minmax;
+}
+
+float ADS1015::readSample(){
+    uint16_t input = 0x00;
+
+    wBuf[0] = ADS1015_CONV_REG; // - Registro de conversion
+    bcm2835_i2c_read_register_rs(wBuf,rBuf,2);
+
+    input = (uint16_t)(rBuf[0] << 8) |(rBuf[1]);
+    input = input >> 4;
+
+    int16_t fullInput = fullRangeMeas(input);
+    return fullInput*resolution;
+}
+
+void ADS1015::initContinuousMode(uint8_t port, uint8_t gain){
+    inputAdd = port;
+    inputGain = gain;
+
+    if(inputAdd < 0x04 or inputAdd > 0x07){ // - Seleccion de entrada individual
+        printf("Invalid Input...\n");
+        return;
+    }
+
+    if(inputGain > ADS1015_512_GAIN){ // - Seleccion de entrada individual
+        printf("Invalid Gain...\n");
+        return;
+    }
+    
+    switch(inputGain){
+        case ADS1015_512_GAIN:
+            resolution = 0.512/2048.0;
+            break;
+        case ADS1015_1024_GAIN:
+            resolution = 1.024/2048.0;
+            break;
+        case ADS1015_2048_GAIN:
+            resolution = 2.048/2048.0;
+            break;
+        case ADS1015_4096_GAIN:
+            resolution = 4.096/2048.0;
+            break;
+        case ADS1015_6144_GAIN:
+            resolution = 6.144/2048.0;
+            break;
+    }
+
+    uint8_t config_low = ADS1015_CONFIG_DR_3300SPS |
+                        ADS1015_CONFIG_COMP_QUE_DC;
+    uint8_t config_high = ADS1015_CONFIG_OS_SINGLE;
+
+    // -- Upper Byte, set the input channel and input gain;
+    config_high |= (uint8_t)(inputAdd << 4) | (uint8_t)(inputGain << 1);
+
+    wBuf[0] = ADS1015_CONFIG_REG;
+    wBuf[1] = config_high;
+    wBuf[2] = config_low;
+
+    bcm2835_i2c_write(wBuf, 3);
 }

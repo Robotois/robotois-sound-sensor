@@ -9,6 +9,7 @@
 #define	ADS1015_H
 
 #include <stdint.h>
+#include <vector>
 
 #define ADS1015_DEFAULT_ADDRESS 0x48 // Conversion Register
 
@@ -41,18 +42,22 @@
 
 // --- Config Register: Upper Byte
 #define ADS1015_CONF_REG_OS_SINGLE 0x80  // Operational Status, begin single conversion
+// Operational Status: begin single conversion.
+// Mode: Continuous conversion mode
+#define ADS1015_CONFIG_OS_SINGLE 0x80  
 
 #define ADS1015_CONF_REG_MODE_SINGLE 0x01  // Power-down single-shot mode (Default)
 
 // --- Config Register: Lower Byte
+// Data Rate: 3300SPS
+#define ADS1015_CONFIG_DR_3300SPS 0xE0 
+// Disable the comparator and put ALERT/RDY in high state (default)
+#define ADS1015_CONFIG_COMP_QUE_DC 0x03
+
 #define ADS1015_CONF_REG_DR_1600SPS 0x80  // 1600SPS (Default)
-
 #define ADS1015_CONF_REG_COMP_MODE_TRAD 0x00  // Traditional comparator with histeresis (Default)
-
 #define ADS1015_CONF_REG_COMP_POL_AL 0x00  // Active-LOW (Default)
-
 #define ADS1015_CONF_REG_COMP_LAT_NL 0x00  // Non-Latching (Default)
-
 #define ADS1015_CONF_REG_COMP_QUE_DC 0x03  // Disable the comparator and put ALERT/RDY in high state (default)
 
 class ADS1015 {
@@ -69,6 +74,9 @@ public:
 
     void selectModule();
     void release();
+    
+    std::vector<float> inputSampling(uint8_t port, uint8_t gain, uint16_t sampleTime);
+    std::vector<float> minMax(std::vector<float> samples);
 private:
     uint8_t addr; // - Direccion por default
     uint8_t inputAdd,inputGain;
@@ -78,6 +86,9 @@ private:
 
     void bcm_init();
     void bcm_end();
+    
+    void initContinuousMode(uint8_t port, uint8_t gain);
+    float readSample();
 };
 
 #endif	/* ADS1015_H */

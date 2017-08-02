@@ -13,6 +13,7 @@ function SoundSensor(port, add = 0) {
   EventEmitter.call(this);
 
   this.sound = new SSensor(port, add);
+  this.eventsEnable = false;
 
   process.on('SIGINT', () => {
     self.sound.release();
@@ -32,24 +33,28 @@ SoundSensor.prototype.getBasicValue = function getBasicValue() {
 };
 
 SoundSensor.prototype.enableEvents = function enableEvents() {
-  if (!this.eventInterval) {
-    let scaledValue;
-    this.eventInterval = setInterval(() => {
-      scaledValue = this.sound.getBasicValue();
-      this.emit('medicion', scaledValue);
-    }, 100); // Tomar mediciones cada 150ms
+  if (!this.eventsEnable) {
+    this.eventsEnable = true;
+    this.sampling();
   }
 };
 
-// SoundSensor.prototype.when = function when(value, callback) {
-//   this.enableEvents();
-//   this.on('medicion', (soundValue) => {
-//     console.log(`Posicion: ${soundValue}`);
-//     if (value == soundValue) {
-//       callback();
-//     }
-//   });
-// };
+SoundSensor.prototype.disableEvents = function disableEvents() {
+  this.eventsEnable = false;
+};
+
+SoundSensor.prototype.sampling = function sampling() {
+  const self = this;
+  function run() {
+    if (!self.eventsEnable) {
+      return;
+    }
+    const value = self.sound.getBasicValue();
+    self.emit('medicion', value);
+    setImmediate(run);
+  }
+  run();
+};
 
 SoundSensor.prototype.release = function release() {
   clearInterval(this.eventInterval);

@@ -1,12 +1,12 @@
 #ifndef SOUNDSENSOR_H
 #define SOUNDSENSOR_H
 
-#include "../../Libraries/ADS1015/ADS1015.h"
+#include "./libraries/robotois-ADS1015/ADS1015.h"
 
 class SoundSensor {
 private:
   ADS1015 *analogModule;
-  uint8_t inputPort;
+  uint8_t adsPort;
   float scaleFactor;
 
 public:
@@ -15,8 +15,7 @@ public:
 
   void selectPort(uint8_t _port);
   float getValue();
-  int16_t getBasicValue();
-  // int16_t getScaledValue();
+  uint8_t getBasicValue();
 
   void release();
 };
