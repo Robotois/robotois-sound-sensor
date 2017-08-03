@@ -103,7 +103,7 @@ void ADS1015::selectInput(uint8_t _inputAdd, uint8_t _gain){
     wBuf[2] = config_low;
 
     bcm2835_i2c_write(wBuf, 3);
-    std::this_thread::sleep_for(std::chrono::microseconds(1000));
+    std::this_thread::sleep_for(std::chrono::microseconds(500));
 }
 
 /**
@@ -165,9 +165,9 @@ void ADS1015::release(){
 }
 
 std::vector<float> ADS1015::inputSampling(uint8_t port, uint8_t gain, uint16_t sampleTime){
+    std::vector<float> samples;
     selectModule();
     initContinuousMode(port, gain);
-    std::vector<float> samples;
     
     auto startTime = std::chrono::high_resolution_clock::now();
     auto elapsedTime = std::chrono::high_resolution_clock::now() - startTime;
@@ -257,4 +257,5 @@ void ADS1015::initContinuousMode(uint8_t port, uint8_t gain){
     wBuf[2] = config_low;
 
     bcm2835_i2c_write(wBuf, 3);
+    std::this_thread::sleep_for(std::chrono::microseconds(500));
 }
