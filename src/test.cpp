@@ -3,7 +3,6 @@
 #include <thread>
 #include <chrono>
 
-//#include "./libraries/robotois-ADS1015/ADS1015.h"
 #include "SoundSensor.h"
 
 void i2c_init();
@@ -14,9 +13,7 @@ int main(int argc, char const *argv[]) {
     SoundSensor sound;
     sound.selectPort(1);
     while(true){
-//        printf("Amplitude: %f\n", sound.getValue());
         printf("Amplitude: %d\n", sound.getBasicValue());
-//        sound.getValue();
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
     i2c_end();
