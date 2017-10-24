@@ -14,7 +14,12 @@
   "dependencies": {
     "bindings": "^1.2.1"
   },
-  "author": "yovany@robotois.com",
+  "author": "yovany.lg@gmail.com",
+  "homepage": "https://github.com/Robotois/robotois-sound-sensor",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Robotois/robotois-sound-sensor.git"
+  },
   "license": "ISC",
   "gypfile": true,
   "devDependencies": {
